@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { ActivityIndicator, Alert, Platform } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { useTheme } from 'styled-components';
@@ -16,36 +16,31 @@ import {
   Title,
   SignInTitle,
   Footer,
-  FooterWrapper
-
+  FooterWrapper,
 } from './styles';
 
 export function SignIn() {
   const [isLoading, setIsLoading] = useState(false);
-  const {signInWithGoogle} = useAuth();
+  const { signInWithGoogle } = useAuth();
   const theme = useTheme();
 
-
-  async function handleSignInWithGoogle(){
+  async function handleSignInWithGoogle() {
     try {
       setIsLoading(true);
       return await signInWithGoogle();
     } catch (err) {
       console.log(err);
-      
+
       Alert.alert('Não foi possível conectar a conta google');
       setIsLoading(false);
-    } 
+    }
   }
 
   return (
     <Container>
       <Header>
         <TitleWrapper>
-          <LogoSvg 
-            width={RFValue(120)}
-            height={RFValue(68)}
-          />
+          <LogoSvg width={RFValue(120)} height={RFValue(68)} />
           <Title>
             Controle suas {'\n'}
             finanças de forma {'\n'}
@@ -61,28 +56,24 @@ export function SignIn() {
 
       <Footer>
         <FooterWrapper>
-          <SignInSocialButton 
+          <SignInSocialButton
             title="Entrar com Google"
             svg={GoogleSvg}
             onPress={handleSignInWithGoogle}
           />
 
-          {
-            Platform.OS === 'ios' &&
-            <SignInSocialButton 
-            title="Entrar com Apple"
-            svg={AppleSvg}
-          />
-          }
+          {Platform.OS === 'ios' && (
+            <SignInSocialButton title="Entrar com Apple" svg={AppleSvg} />
+          )}
         </FooterWrapper>
 
-        { isLoading && 
-          <ActivityIndicator 
+        {isLoading && (
+          <ActivityIndicator
             color={theme.colors.shape}
             style={{ marginTop: 18 }}
-          />}
+          />
+        )}
       </Footer>
-
     </Container>
-  )
+  );
 }

@@ -1,15 +1,15 @@
-import React, {useCallback, useEffect, useState} from 'react'
+import React, { useCallback, useEffect, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { VictoryPie } from "victory-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { VictoryPie } from 'victory-native';
 import { RFValue } from 'react-native-responsive-fontsize';
-import { addMonths, subMonths, format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { addMonths, subMonths, format, ptBR } from 'date-fns';
 
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
-import { useTheme } from "styled-components"; 
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useTheme } from 'styled-components';
 
+import { ActivityIndicator } from 'react-native';
 import { HistoryCard } from '../../components/HistoryCard';
 
 import {
@@ -22,10 +22,9 @@ import {
   MonthSelectButton,
   MonthSelectIcon,
   Month,
-  LoadContainer
+  LoadContainer,
 } from './styles';
 import { categories } from '../../utils/categories';
-import { ActivityIndicator } from 'react-native';
 import { useAuth } from '../../hooks/auth';
 
 interface TransactionDataProps {
@@ -35,7 +34,6 @@ interface TransactionDataProps {
   category: string;
   date: string;
 }
-
 
 interface CategoryData {
   key: string;
@@ -49,20 +47,21 @@ interface CategoryData {
 export function Resume() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [totalByCategories, setTotalByCategories] = useState<CategoryData[]>([]);
+  const [totalByCategories, setTotalByCategories] = useState<CategoryData[]>(
+    [],
+  );
 
   const { user } = useAuth();
 
   const theme = useTheme();
 
-  function handleDateChange(action: 'next' | 'prev'){
+  function handleDateChange(action: 'next' | 'prev') {
     if (action === 'next') {
       setSelectedDate(addMonths(selectedDate, 1));
     } else {
       setSelectedDate(subMonths(selectedDate, 1));
     }
   }
-
 
   async function loadData() {
     setIsLoading(true);
@@ -71,20 +70,22 @@ export function Resume() {
     const response = await AsyncStorage.getItem(dataKey);
     const responseFormatted = response ? JSON.parse(response) : [];
 
-    const expensives = responseFormatted
-      .filter((expensive: TransactionDataProps) => 
+    const expensives = responseFormatted.filter(
+      (expensive: TransactionDataProps) =>
         expensive.type === 'negative' &&
         new Date(expensive.date).getMonth() === selectedDate.getMonth() &&
-        new Date(expensive.date).getFullYear() === selectedDate.getFullYear()
-      );
-    
-    const expensivesTotal = expensives
-      .reduce((acc: number, expensive: TransactionDataProps) => {
+        new Date(expensive.date).getFullYear() === selectedDate.getFullYear(),
+    );
+
+    const expensivesTotal = expensives.reduce(
+      (acc: number, expensive: TransactionDataProps) => {
         return acc + Number(expensive.amount);
-      }, 0);
+      },
+      0,
+    );
 
     const totalByCategory: CategoryData[] = [];
-    
+
     categories.forEach(category => {
       let categorySum = 0;
 
@@ -95,14 +96,14 @@ export function Resume() {
       });
 
       if (categorySum > 0) {
+        const totalFormatted = categorySum.toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+        });
 
-        const totalFormatted = categorySum
-          .toLocaleString('pt-BR', {
-            style: 'currency',
-            currency: 'BRL'
-        })
-        
-        const percent = `${(categorySum / expensivesTotal * 100).toFixed(0)}%`;
+        const percent = `${((categorySum / expensivesTotal) * 100).toFixed(
+          0,
+        )}%`;
 
         totalByCategory.push({
           key: category.key,
@@ -110,10 +111,9 @@ export function Resume() {
           color: category.color,
           total: categorySum,
           totalFormatted,
-          percent
-        })
+          percent,
+        });
       }
-      
     });
 
     setTotalByCategories(totalByCategory);
@@ -124,78 +124,68 @@ export function Resume() {
   useFocusEffect(
     useCallback(() => {
       loadData();
-    }, [selectedDate])
-  )
+    }, [selectedDate]),
+  );
 
   return (
     <Container>
+      <Header>
+        <Title>Resumo por categoria</Title>
+      </Header>
 
-      
-        
-        <Header>
-          <Title>Resumo por categoria</Title>
-        </Header>
+      {isLoading ? (
+        <LoadContainer>
+          <ActivityIndicator color={theme.colors.primary} size="large" />
+        </LoadContainer>
+      ) : (
+        <Content
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{
+            paddingHorizontal: 24,
+            paddingBottom: useBottomTabBarHeight(),
+          }}
+        >
+          <MonthSelect>
+            <MonthSelectButton onPress={() => handleDateChange('prev')}>
+              <MonthSelectIcon name="chevron-left" />
+            </MonthSelectButton>
 
-        {
-          isLoading 
-          ? <LoadContainer>
-              <ActivityIndicator
-                color={theme.colors.primary} 
-                size="large"
-              />
-            </LoadContainer> 
-          :
-            <Content
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{
-              paddingHorizontal: 24,
-              paddingBottom: useBottomTabBarHeight()
-            }}
-          >
+            <Month>
+              {format(selectedDate, 'MMMM, yyyy', { locale: ptBR })}
+            </Month>
 
-            <MonthSelect>
-              <MonthSelectButton onPress={() => handleDateChange('prev')}>
-                <MonthSelectIcon name="chevron-left"/>
-              </MonthSelectButton>
+            <MonthSelectButton onPress={() => handleDateChange('next')}>
+              <MonthSelectIcon name="chevron-right" />
+            </MonthSelectButton>
+          </MonthSelect>
 
-              <Month>{ format(selectedDate, 'MMMM, yyyy', { locale: ptBR})}</Month>
+          <ChartContainer>
+            <VictoryPie
+              data={totalByCategories}
+              colorScale={totalByCategories.map(category => category.color)}
+              style={{
+                labels: {
+                  fontSize: RFValue(18),
+                  fontWeight: 'bold',
+                  fill: theme.colors.shape,
+                },
+              }}
+              labelRadius={50}
+              x="percent"
+              y="total"
+            />
+          </ChartContainer>
 
-              <MonthSelectButton onPress={() => handleDateChange('next')}>
-                <MonthSelectIcon name="chevron-right"/>
-              </MonthSelectButton>
-            </MonthSelect>
-
-            <ChartContainer>
-              <VictoryPie
-                data={totalByCategories}
-                colorScale={totalByCategories.map(category => category.color)}
-                style={{
-                  labels: { 
-                    fontSize: RFValue(18),
-                    fontWeight: 'bold',
-                    fill: theme.colors.shape
-                  }
-                }}
-                labelRadius={50}
-                x="percent"
-                y="total"
-              />
-            </ChartContainer>
-
-            {
-              totalByCategories.map(item => (
-                <HistoryCard
-                  key={item.key}
-                  title={item.name}
-                  amount={item.totalFormatted}
-                  color={item.color}
-                />
-              ))
-            }
-          </Content>
-        }
-        
-
+          {totalByCategories.map(item => (
+            <HistoryCard
+              key={item.key}
+              title={item.name}
+              amount={item.totalFormatted}
+              color={item.color}
+            />
+          ))}
+        </Content>
+      )}
     </Container>
-  )
+  );
 }

@@ -1,10 +1,6 @@
-import React from 'react'
+import React from 'react';
 
-import {
-  Container,
-  Title,
-  Amount
-} from './styles';
+import { Container, Title, Amount } from './styles';
 
 interface HistoryCardProps {
   title: string;
@@ -12,12 +8,11 @@ interface HistoryCardProps {
   color: string;
 }
 
-export function HistoryCard({title, amount, color}: HistoryCardProps) {
-
+export function HistoryCard({ title, amount, color }: HistoryCardProps) {
   return (
     <Container color={color}>
       <Title>{title}</Title>
       <Amount>{amount}</Amount>
     </Container>
-  )
+  );
 }

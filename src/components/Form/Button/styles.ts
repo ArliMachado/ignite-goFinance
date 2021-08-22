@@ -1,6 +1,6 @@
-import styled from "styled-components/native";
-import { RFValue } from "react-native-responsive-fontsize";
-import { RectButton } from "react-native-gesture-handler";
+import styled from 'styled-components/native';
+import { RFValue } from 'react-native-responsive-fontsize';
+import { RectButton } from 'react-native-gesture-handler';
 
 export const Container = styled(RectButton)`
   width: 100%;
@@ -9,7 +9,6 @@ export const Container = styled(RectButton)`
   padding: 18px;
   border-radius: 5px;
   align-items: center;
-
 `;
 
 export const Title = styled.Text`

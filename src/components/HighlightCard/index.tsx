@@ -7,7 +7,7 @@ import {
   Icon,
   Footer,
   Amount,
-  LastTransaction
+  LastTransaction,
 } from './styles';
 
 interface HighLightCardProps {
@@ -15,22 +15,20 @@ interface HighLightCardProps {
   title: string;
   amount: string;
   lastTransaction: string;
-
 }
 
 const icon = {
   up: 'arrow-up-circle',
   down: 'arrow-down-circle',
-  total: 'dollar-sign'
-}
+  total: 'dollar-sign',
+};
 
 export function HighLightCard({
   type,
-  title, 
-  amount, 
-  lastTransaction
+  title,
+  amount,
+  lastTransaction,
 }: HighLightCardProps) {
-
   return (
     <Container type={type}>
       <Header>
@@ -42,5 +40,5 @@ export function HighLightCard({
         <LastTransaction type={type}>{lastTransaction}</LastTransaction>
       </Footer>
     </Container>
-  )
+  );
 }
