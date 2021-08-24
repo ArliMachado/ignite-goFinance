@@ -58,9 +58,8 @@ function getLastTransactionDate(
   }
 
   const lastTransaction = new Date(
-    Math.max.apply(
-      Math,
-      collectionFilttered.map((transaction: DataListProps) =>
+    Math.max(
+      ...collectionFilttered.map((transaction: DataListProps) =>
         new Date(transaction.date).getTime(),
       ),
     ),
