@@ -1,6 +1,7 @@
 {
   "env": {
-      "es2021": true
+      "es2021": true,
+      "jest/globals": true
   },
   "extends": [
       "plugin:react/recommended",
@@ -23,7 +24,8 @@
       "react",
       "react-hooks",
       "@typescript-eslint",
-      "prettier"
+      "prettier",
+      "jest"
   ],
   "rules": {
     "react/prop-types": "off",
@@ -66,7 +68,13 @@
         "ts": "never",
         "tsx": "never"
       }
-    ]
+    ],
+
+    "jest/no-disabled-tests": "warn",
+    "jest/no-focused-tests": "error",
+    "jest/no-identical-title": "error",
+    "jest/prefer-to-have-length": "warn",
+    "jest/valid-expect": "error"
   },
   "settings": {
     "import/resolver": {
